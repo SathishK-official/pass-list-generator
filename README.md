@@ -13,7 +13,7 @@ Perfect for use with cracking tools like **John the Ripper**, **Hashcat**, and *
 ---
 
 ## 🌍 Live Demo
-🔗 **[Click here to try it out](https://your-github-username.github.io/password-list-generator/)**
+🔗 **[click here to use ](https://sathishk-official.github.io/pass-list-generator/)**
 
 ---
 
@@ -51,13 +51,21 @@ Perfect for use with cracking tools like **John the Ripper**, **Hashcat**, and *
 ## 📷 Demo Screenshots
 
 ### Main Interface
-![Main UI](screenshots/main_ui.png)
+![Main UI]<img width="1919" height="1035" alt="image" src="https://github.com/user-attachments/assets/9e71f738-34a6-4b7c-a459-68946a59c8d5" />
+
 
 ### Generation Confirmation
-![Confirmation Modal](screenshots/confirmation.png)
+![Confirmation Modal]<img width="1919" height="1034" alt="image" src="https://github.com/user-attachments/assets/b110df1e-230c-4b14-b8fa-4e4d68ab0da2" />
+
 
 ### Generated Batch Files
-![Batches](screenshots/batches.png)
+![Batches]<img width="1919" height="1033" alt="image" src="https://github.com/user-attachments/assets/542365c1-16e5-4915-9b87-45752fe3c492" />
+
+### Downloaded Batch Files as ZIP
+<img width="1918" height="1030" alt="image" src="https://github.com/user-attachments/assets/e2852590-54c1-4bd6-ac16-1e26c4683354" />
+
+### Seperate seperate files inside Batch ZIP Files
+<img width="1722" height="969" alt="image" src="https://github.com/user-attachments/assets/92f621ef-0325-4d2b-badb-e5e093717032" />
 
 ---
 
