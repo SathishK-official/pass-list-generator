@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Password Combination Generator</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+    <style>
+        /* New: Vibrant multi-color gradient background */
+        body {
+            background: linear-gradient(135deg, #00B4DB, #0083B0, #ED4264, #FF0084, #9D50BB); /* Blue, Cyan, Rose, Fuchsia, Violet */
+            min-height: 100vh;
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+        }
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .hidden {
+            display: none;
+        }
+        /* Container background: Improved violet gradient */
+        .gradient-bg {
+            background: linear-gradient(to bottom right, #7F00FF, #E100FF); /* Violet to Magenta */
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), 
+                        0 0 25px rgba(127, 0, 255, 0.6),
+                        0 0 50px rgba(225, 0, 255, 0.4),
+                        inset 0 0 30px rgba(255,255,255,0.3);
+            position: relative;
+            overflow: hidden;
+            filter: drop-shadow(0 20px 25px rgba(0, 0, 0, 0.5));
+        }
+        
+        /* Glowing border animation */
+        .gradient-bg::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            padding: 6px; /* Doubled from 3px to 6px */
+            background: linear-gradient(45deg, 
+                                #00B4DB, #0083B0, 
+                                #ED4264, #FF0084, 
+                                #9D50BB);
+            -webkit-mask: 
+                linear-gradient(#fff 0 0) content-box, 
+                linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            animation: borderAnimation 8s linear infinite;
+            z-index: -1;
+        }
+        
+        /* Container floating animation */
+        @keyframes floatAnimation {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-15px) rotate(1deg); }
+        }
+        
+        /* Border color animation */
+        @keyframes borderAnimation {
+            0% { filter: hue-rotate(0deg); }
+            100% { filter: hue-rotate(360deg); }
+        }
+        
+        /* Initial state - container floats */
+        .gradient-bg {
+            animation: floatAnimation 6s ease-in-out infinite;
+        }
+        
+        /* Pause animation on hover */
+        .gradient-bg:hover {
+            animation-play-state: paused;
+        }
+        /* Adjust text color for better contrast on dark container background */
+        .gradient-bg label,
+        .gradient-bg h1 {
+            color: #ffffff; /* White text for better readability */
+        }
+        /* Adjust input border for better visibility */
+        .gradient-bg input[type="text"],
+        .gradient-bg input[type="number"] {
+            border-color: #6A0DAD; /* A darker violet for input borders */
+            background-color: rgba(255, 255, 255, 0.1); /* Slightly transparent white background for inputs */
+            color: #ffffff; /* White text inside inputs */
+        }
+        /* Placeholder color for inputs */
+        .gradient-bg input::placeholder {
+            color: #cccccc;
+        }
+
+        /* Modal specific adjustments for dark background (retained) */
+        #confirmModal {
+            /* Ensure it's on top of everything */
+            z-index: 1000; /* Increased z-index */
+            /* Add a fade-in animation for the modal itself */
+            animation: modalFadeIn 0.3s ease-out forwards;
+        }
+
+        @keyframes modalFadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        #confirmModal .bg-white { /* Target the modal content specifically */
+            background-color: #ffffff; /* Keep modal content white */
+            /* Add a slight scale-up animation for the modal content */
+            animation: modalContentScale 0.3s ease-out forwards;
+        }
+
+        @keyframes modalContentScale {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        #confirmModal .text-gray-900 { /* Modal title */
+            color: #1a202c; /* Dark text for modal title */
+        }
+        #confirmModal .text-gray-500 { /* Modal message */
+            color: #4a5568; /* Darker text for modal message */
+        }
+        #confirmModal .text-gray-700 { /* Modal batch label */
+            color: #4a5568; /* Darker text for modal batch label */
+        }
+        #confirmModal input[type="number"] { /* Modal batch input */
+            border-color: #cbd5e0;
+            background-color: #ffffff;
+            color: #1a202c;
+        }
+        #confirmModal input::placeholder {
+            color: #a0aec0;
+        }
+        #confirmModal .bg-gray-50 { /* Modal footer */
+            background-color: #f7fafc;
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen">
+    <div class="rounded-lg p-8 max-w-md w-full fade-in gradient-bg" id="mainContainer">
+        <h1 class="text-2xl font-bold text-center mb-4">Password Combination Generator</h1>
+        <div class="mb-4">
+            <label for="chars" class="block">Characters to use:</label>
+            <input type="text" id="chars" class="border rounded-md w-full p-2" placeholder="abc123@#">
+        </div>
+        <div class="mb-4">
+            <label for="length" class="block">Password length:</label>
+            <input type="number" id="length" class="border rounded-md w-full p-2" value="4">
+        </div>
+        <div id="batchContainer" class="mb-4 hidden">
+            <label for="batchSize" class="block">Batch size per .txt file:</label>
+            <input type="number" id="batchSize" class="border rounded-md w-full p-2" value="1000">
+        </div>
+        <button id="generateBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition-colors duration-200 w-full">
+            Generate Password List
+        </button>
+        <div id="status" class="mt-4 text-center"></div>
+        <div id="output" class="mt-4 hidden"></div>
+    </div>
+
+    <!-- Confirmation Modal - MOVED OUTSIDE mainContainer -->
+    <div id="confirmModal" class="fixed inset-0 overflow-y-auto hidden">
+        <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center">
+            <div class="fixed inset-0 transition-opacity" aria-hidden="true">
+                <div class="absolute inset-0 bg-gray-900 opacity-90"></div> 
+            </div>
+            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                    <h3 class="text-lg leading-6 font-medium text-gray-900" id="modalTitle"></h3>
+                    <div class="mt-2">
+                        <p class="text-sm text-gray-500" id="modalMessage"></p>
+                    </div>
+                    <div id="modalBatchInputContainer" class="mt-4 hidden">
+                        <label for="modalBatchSize" class="block text-sm font-medium mb-1">Batch size per .txt file:</label>
+                        <input type="number" id="modalBatchSize" class="border rounded-md w-full p-2" value="1000">
+                        <p class="text-xs text-gray-500 mt-1">Passwords will be grouped into .txt files of this size.</p>
+                    </div>
+                </div>
+                <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                    <button type="button" id="confirmProceed" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm">
+                        Proceed
+                    </button>
+                    <button type="button" id="confirmCancel" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const container = document.getElementById('mainContainer');
+            let hasHovered = false;
+            
+            container.addEventListener('mouseenter', function() {
+                if (!hasHovered) {
+                    this.style.animationPlayState = 'paused';
+                    hasHovered = true;
+                }
+            });
+        });
+        document.getElementById('generateBtn').addEventListener('click', async () => {
+            const chars = document.getElementById('chars').value;
+            const length = parseInt(document.getElementById('length').value);
+            const status = document.getElementById('status');
+            const output = document.getElementById('output');
+
+            if (!chars.trim()) {
+                status.textContent = "Error: Please enter characters to use";
+                return;
+            }
+            if (length <= 0 || isNaN(length)) {
+                status.textContent = "Error: Password length must be a positive number";
+                return;
+            }
+
+            status.innerHTML = '<span class="text-blue-600"><i class="fas fa-spinner fa-spin"></i> Preparing generation...</span>';
+            output.innerHTML = '';
+            output.classList.add('hidden');
+            document.getElementById('generateBtn').disabled = true;
+
+            const totalCombinations = Math.pow(chars.length, length);
+            
+            const modal = document.getElementById('confirmModal');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalMessage = document.getElementById('modalMessage');
+            const modalBatchInputContainer = document.getElementById('modalBatchInputContainer');
+            const modalBatchSizeInput = document.getElementById('modalBatchSize'); 
+
+            if (totalCombinations > 1000) {
+                modalBatchInputContainer.classList.remove('hidden');
+                modalBatchSizeInput.value = Math.min(1000, totalCombinations);
+                modalTitle.textContent = 'Confirm Large Generation';
+                modalMessage.textContent = `Total combinations: ${totalCombinations.toLocaleString()}. This may generate many files.`;
+            } else {
+                modalBatchInputContainer.classList.add('hidden');
+                modalTitle.textContent = 'Confirm Generation';
+                modalMessage.textContent = `Total combinations: ${totalCombinations.toLocaleString()}\nProceed with generation?`;
+            }
+            
+            modal.classList.remove('hidden');
+
+            const confirmed = await new Promise((resolve) => {
+                document.getElementById('confirmProceed').onclick = () => {
+                    modal.classList.add('hidden');
+                    resolve(true);
+                };
+                document.getElementById('confirmCancel').onclick = () => {
+                    modal.classList.add('hidden');
+                    status.textContent = "Generation canceled";
+                    document.getElementById('generateBtn').disabled = false;
+                    resolve(false);
+                };
+            });
+
+            if (!confirmed) return;
+
+            let actualBatchSize;
+            if (totalCombinations > 1000) {
+                actualBatchSize = parseInt(modalBatchSizeInput.value);
+                if (isNaN(actualBatchSize) || actualBatchSize <= 0) {
+                    status.textContent = "Error: Invalid batch size entered. Please enter a positive number.";
+                    document.getElementById('generateBtn').disabled = false;
+                    return;
+                }
+            } else {
+                actualBatchSize = totalCombinations;
+            }
+
+            status.innerHTML = '<span class="text-blue-600"><i class="fas fa-spinner fa-spin"></i> Generating combinations...</span>';
+
+            const combinations = [];
+            for (let i = 0; i < totalCombinations; i++) {
+                let combo = '';
+                let temp = i;
+                for (let j = 0; j < length; j++) {
+                    combo += chars[temp % chars.length];
+                    temp = Math.floor(temp / chars.length);
+                }
+                combinations.push(combo);
+            }
+
+            const batches = [];
+            for (let i = 0; i < combinations.length; i += actualBatchSize) {
+                batches.push(combinations.slice(i, i + actualBatchSize));
+            }
+
+            const zip = new JSZip();
+            const promises = batches.map((batch, index) => {
+                const fileName = `batch_${index + 1}.txt`;
+                zip.file(fileName, batch.join('\n'));
+            });
+
+            Promise.all(promises).then(() => {
+                zip.generateAsync({ type: "blob" }).then((content) => {
+                    const link = document.createElement('a');
+                    link.href = URL.createObjectURL(content);
+                    link.download = 'password_batches.zip';
+                    link.click();
+                });
+
+                status.innerHTML = '<span class="text-green-600"><i class="fas fa-check"></i> Done! Files have been generated and zipped.</span>';
+                output.classList.remove('hidden');
+                output.innerHTML = `
+                    <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
+                        <p>Generated ${batches.length} batch files</p>
+                        <p class="text-sm mt-2">Total combinations: ${totalCombinations.toLocaleString()}</p>
+                    </div>
+                `;
+                document.getElementById('generateBtn').disabled = false;
+            });
+        });
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+</body>
+</html>
